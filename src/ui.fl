@@ -848,7 +848,7 @@ MVC->SetFan(o->value()*(255.0f/12.0f));}
                 Fl_Value_Input TargetTempText {
                   label Target
                   callback {MVC->SetTargetTemp(o->value());}
-                  xywh {1175 200 90 24} maximum 300 value 200
+                  xywh {1175 200 90 24} maximum 300 value 250
                 }
                 Fl_Output CurrentTempText {
                   label Current
@@ -871,7 +871,7 @@ MVC->SetFan(o->value()*(255.0f/12.0f));}
                 Fl_Value_Input TargetBedTempText {
                   label Target
                   callback {MVC->SetBedTargetTemp(o->value());}
-                  xywh {1175 246 90 24} maximum 300 value 200
+                  xywh {1175 246 90 24} maximum 300 value 250
                 }
               }
             }
