@@ -208,7 +208,8 @@ void ModelViewController::Timer_CB()
 	}
 	if ( read_pending != "" ) {
 	        ProcessControl.ReadGCode(read_pending);
-		read_pending = "";
+            read_pending = "";
+            redraw();
 	}
 }
 
@@ -572,8 +573,27 @@ void ModelViewController::ConvertToGCode()
 			}
 		}
 	}
-	finalstl.Write("/home/arjan/test.stl");
+
+	char fn[] = "/tmp/skeinforge-tmp.stl";
+	cout << "Writing STL to " << fn << endl;
+	finalstl.Write(fn);
+
+	// invoking skeinforge
+	char line[255];
+	char cmd[1024];
+	sprintf(cmd, "/usr/bin/env python /home/arjan/devel/reprap/skeinforge/skeinforge_application/skeinforge.py %s", fn);
+	cout << "Invoking skeinforge" << endl;
+	FILE *fp = popen(cmd, "r");
+	while (fgets(line, 255, fp) != NULL)
+	{
+		cout << line;
+		cout << "---x" << endl;
+	}
+	pclose(fp);
+
 	cout << "ok!" << endl;
+
+	ReadGCode("/tmp/skeinforge-tmp_export.gcode");
 	redraw();
 }
 
