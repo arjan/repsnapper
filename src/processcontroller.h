@@ -134,6 +134,7 @@ public:
 	
 	// STL Functions
 	bool ReadStl(string filename, STL &newstl) { return newstl.Read(filename);};
+    void WriteStl(string filename);
 	void OptimizeRotation();
 	void RotateObject(Vector3f axis, float a);
 	Matrix4f GetSTLTransformationMatrix(int object=-1, int file=-1) const ;

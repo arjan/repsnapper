@@ -225,6 +225,7 @@ public:
 	STL();
 
 	bool Read(string filename, bool force_binary = false );
+	bool Write(string filename );
 	void GetObjectsFromIvcon();
 	void clear() { triangles.clear(); }
 	void displayInfillOld(const ProcessController &PC, CuttingPlane &plane, uint LayerNr, vector<int>& altInfillLayers);

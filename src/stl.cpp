@@ -2941,6 +2941,69 @@ void STL::CenterAroundXY()
 }
 
 
+bool STL::Write(string filename)
+{
+	unsigned int count;
+	ofstream outfile;
+	try
+	{
+		outfile.open(filename.c_str(),  ios::out | ios::binary);
+		if(!outfile.good())
+			return false;
+
+        // write header
+        char header[80];
+        memset(header, 0, 80);
+        outfile.write(header, 80);
+
+        // write num triangles
+        count = triangles.size();
+        outfile.write(reinterpret_cast < char * > (&count), sizeof(unsigned int));
+
+        cout << "triangles: " << count << endl;
+
+        // write triangles
+		for(uint i = 0; i < count; i++)
+        {
+            Triangle *t = &triangles[i];
+
+            // write normal
+            outfile.write(reinterpret_cast < char * > (&t->Normal.x), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->Normal.y), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->Normal.z), sizeof(float));
+
+            // write a
+            outfile.write(reinterpret_cast < char * > (&t->A.x), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->A.y), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->A.z), sizeof(float));
+
+            // write b
+            outfile.write(reinterpret_cast < char * > (&t->B.x), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->B.y), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->B.z), sizeof(float));
+
+            // write c
+            outfile.write(reinterpret_cast < char * > (&t->C.x), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->C.y), sizeof(float));
+            outfile.write(reinterpret_cast < char * > (&t->C.z), sizeof(float));
+
+            // write space
+            unsigned short xxx = 0;
+            outfile.write(reinterpret_cast < char * > (&xxx), sizeof(unsigned short));
+		}
+
+        outfile.close();
+	}
+	catch (ofstream::failure e)
+	{
+		string error = e.what();
+		cout << "Exception writing file: " << error << endl;
+	}
+
+	return true;
+}
+
+
 void Poly::calcHole(vector<Vector2f> &offsetVertices)
 {
 	if(points.size() == 0)
@@ -2973,4 +3036,5 @@ void Poly::calcHole(vector<Vector2f> &offsetVertices)
 	Vector2f Vb=V3-V1;
 	hole = Va.cross(Vb) > 0;
 }
+
 

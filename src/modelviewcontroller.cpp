@@ -208,7 +208,8 @@ void ModelViewController::Timer_CB()
 	}
 	if ( read_pending != "" ) {
 	        ProcessControl.ReadGCode(read_pending);
-		read_pending = "";
+            read_pending = "";
+            redraw();
 	}
 }
 
