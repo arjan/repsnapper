@@ -551,49 +551,29 @@ void ModelViewController::ReadGCode(string filename) {
 
 void ModelViewController::ConvertToGCode()
 {
-	STL finalstl;
-	for(uint o=0;o<ProcessControl.rfo.Objects.size();o++)
-	{
-		for (uint f=0;f<ProcessControl.rfo.Objects[o].files.size();f++)
-		{
-			STL* stl = &ProcessControl.rfo.Objects[o].files[f].stl;	   // Get a pointer to the object
-			Matrix4f T = ProcessControl.GetSTLTransformationMatrix(o,f);
-			Vector3f trans = T.getTranslation();
-			trans += Vector3f(ProcessControl.PrintMargin.x+ProcessControl.RaftSize*ProcessControl.RaftEnable, ProcessControl.PrintMargin.y+ProcessControl.RaftSize*ProcessControl.RaftEnable, 0);
-			//T.setTranslation(t);
+	string GcodeTxt;
 
-			for (uint i=0; i<stl->triangles.size(); i++)
-			{
-				Triangle t = stl->triangles[i];
-				Triangle newt = Triangle(t.axis, t.A, t.B, t.C);
-				newt.SetNormal(t.Normal);
-				newt.Translate(trans);
-				finalstl.triangles.push_back(newt);
-				newt.AccumulateMinMax(finalstl.Min, finalstl.Max);
-			}
-		}
-	}
+	Fl_Text_Buffer* buffer = gui->GCodeResult->buffer();
+	buffer->remove(0, buffer->length());
 
-	char fn[] = "/tmp/skeinforge-tmp.stl";
-	cout << "Writing STL to " << fn << endl;
-	finalstl.Write(fn);
+	buffer = gui->GCodeStart->buffer();
+	char* pText = buffer->text();
+	string GCodeStart(pText);
+	buffer = gui->GCodeLayer->buffer();
+	free(pText);
+	pText = buffer->text();
+	string GCodeLayer(pText);
+	buffer = gui->GCodeEnd->buffer();
+	free(pText);
+	pText = buffer->text();
+	string GCodeEnd(pText);
+	free(pText);
 
-	// invoking skeinforge
-	char line[255];
-	char cmd[1024];
-	sprintf(cmd, "/usr/bin/env python /home/arjan/devel/reprap/skeinforge/skeinforge_application/skeinforge.py %s", fn);
-	cout << "Invoking skeinforge" << endl;
-	FILE *fp = popen(cmd, "r");
-	while (fgets(line, 255, fp) != NULL)
-	{
-		cout << line;
-		cout << "---x" << endl;
-	}
-	pclose(fp);
+	ProcessControl.ConvertToGCode(GcodeTxt, GCodeStart, GCodeLayer, GCodeEnd);
+	buffer = gui->GCodeResult->buffer();
 
-	cout << "ok!" << endl;
-
-	ReadGCode("/tmp/skeinforge-tmp_export.gcode");
+	GcodeTxt += "\0";
+	buffer->append( GcodeTxt.c_str() );
 	redraw();
 }
 

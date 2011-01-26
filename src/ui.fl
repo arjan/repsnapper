@@ -35,6 +35,11 @@ class GUI {open
             callback {FileChooser::ioDialog (MVC, FileChooser::OPEN, FileChooser::GCODE);}
             xywh {20 20 36 21}
           }
+          MenuItem SaveStl {
+            label {Save Stl...}
+            callback {FileChooser::ioDialog (MVC, FileChooser::SAVE, FileChooser::STL, true);}
+            xywh {20 20 36 21}
+          }
           Submenu Preferences {
             label Preferences
             xywh {5 5 70 21}

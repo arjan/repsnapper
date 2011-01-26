@@ -33,6 +33,8 @@ void ProcessController::ConvertToGCode(string &GcodeTxt, const string &GcodeStar
 		gui->ProgressBar->maximum(Max.z);
 	}
 
+    if (false)
+    {
 	// Make Layers
 	uint LayerNr = 0;
 	uint LayerCount = (uint)ceil((Max.z+LayerThickness*0.5f)/LayerThickness);
@@ -122,6 +124,31 @@ void ProcessController::ConvertToGCode(string &GcodeTxt, const string &GcodeStar
 		AntioozeDistance = 0;
 	}
 	gcode.MakeText(GcodeTxt, GcodeStart, GcodeLayer, GcodeEnd, UseIncrementalEcode, Use3DGcode, AntioozeDistance, AntioozeSpeed);
+        }
+
+    else
+    {
+        // Save STL
+        WriteStl("/tmp/skeinforge-tmp.stl");
+
+        // Invoke skeinforge
+        char line[255];
+        char cmd[] = "/usr/bin/env python /home/arjan/devel/reprap/skeinforge/skeinforge_application/skeinforge.py /tmp/skeinforge-tmp.stl";
+
+        gui->ProgressBar->label("Invoking skeinforge");
+        gui->ProgressBar->redraw();
+        FILE *fp = popen(cmd, "r");
+        while (fgets(line, 255, fp) != NULL)
+        {
+            gui->ProgressBar->label(line);
+            gui->ProgressBar->redraw();
+            cout << line;
+        }
+        pclose(fp);
+        
+        ReadGCode("/tmp/skeinforge-tmp_export.gcode");
+    }
+
 	gui->ProgressBar->label("Done");
 }
 
@@ -695,6 +722,34 @@ void ProcessController::LoadConfig(string filename)
 			m_ShrinkQuality = SHRINK_FAST;
 	}
 }
+
+void ProcessController::WriteStl(string filename)
+{
+    STL finalstl;
+    for(uint o=0;o<rfo.Objects.size();o++)
+    {
+        for (uint f=0;f<rfo.Objects[o].files.size();f++)
+        {
+            STL* stl = &rfo.Objects[o].files[f].stl;	   // Get a pointer to the object
+            Matrix4f T = GetSTLTransformationMatrix(o,f);
+            Vector3f trans = T.getTranslation();
+            trans += Vector3f(PrintMargin.x+RaftSize*RaftEnable, PrintMargin.y+RaftSize*RaftEnable, 0);
+            //T.setTranslation(t);
+            
+            for (uint i=0; i<stl->triangles.size(); i++)
+            {
+                Triangle t = stl->triangles[i];
+                Triangle newt = Triangle(t.axis, t.A, t.B, t.C);
+                newt.SetNormal(t.Normal);
+                newt.Translate(trans);
+                finalstl.triangles.push_back(newt);
+                newt.AccumulateMinMax(finalstl.Min, finalstl.Max);
+            }
+        }
+    }
+    finalstl.Write(filename);
+}
+
 
 /*
 void ProcessController::BindLua(lua_State *myLuaState)
