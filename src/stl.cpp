@@ -61,6 +61,20 @@ extern "C" {
 #define MAX(A,B) ((A)>(B)? (A):(B))
 #define ABS(a)	   (((a) < 0) ? -(a) : (a))
 
+#ifdef __ppc__
+#define SWAP4( _v ) {	     \
+    char *vp = (char*)&(_v); \
+    char vt = vp[0];	     \
+    vp[0] = vp[3];	     \
+    vp[3] = vt;		     \
+    vt = vp[1];		     \
+    vp[1] = vp[2];	     \
+    vp[2] = vt;		     \
+  }
+#else /* not __ppc__ */
+#define SWAP4( _v ) /* empty */
+#endif /* __ppc__ */
+
 /* A number that speaks for itself, every kissable digit.                    */
 
 #define PI 3.141592653589793238462643383279502884197169399375105820974944592308
@@ -190,26 +204,27 @@ bool STL::Read(string filename, bool force_binary)
 		{
 			infile.seekg(80, ios_base::beg);
 			infile.read(reinterpret_cast < char * > (&count), sizeof(unsigned int));	// N_Triangles
+			SWAP4(count);
 			triangles.reserve(count);
 
 			for(uint i = 0; i < count; i++)
 			{
 				float a,b,c;
-				infile.read(reinterpret_cast < char * > (&a), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&b), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&c), sizeof(float));
+				infile.read(reinterpret_cast < char * > (&a), sizeof(float)); SWAP4(a);
+				infile.read(reinterpret_cast < char * > (&b), sizeof(float)); SWAP4(b);
+				infile.read(reinterpret_cast < char * > (&c), sizeof(float)); SWAP4(c);
 				Vector3f N(a,b,c);
-				infile.read(reinterpret_cast < char * > (&a), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&b), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&c), sizeof(float));
+				infile.read(reinterpret_cast < char * > (&a), sizeof(float)); SWAP4(a);
+				infile.read(reinterpret_cast < char * > (&b), sizeof(float)); SWAP4(b);
+				infile.read(reinterpret_cast < char * > (&c), sizeof(float)); SWAP4(c);
 				Vector3f Ax(a,b,c);
-				infile.read(reinterpret_cast < char * > (&a), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&b), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&c), sizeof(float));
+				infile.read(reinterpret_cast < char * > (&a), sizeof(float)); SWAP4(a);
+				infile.read(reinterpret_cast < char * > (&b), sizeof(float)); SWAP4(b);
+				infile.read(reinterpret_cast < char * > (&c), sizeof(float)); SWAP4(c);
 				Vector3f Bx(a,b,c);
-				infile.read(reinterpret_cast < char * > (&a), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&b), sizeof(float));
-				infile.read(reinterpret_cast < char * > (&c), sizeof(float));
+				infile.read(reinterpret_cast < char * > (&a), sizeof(float)); SWAP4(a);
+				infile.read(reinterpret_cast < char * > (&b), sizeof(float)); SWAP4(b);
+				infile.read(reinterpret_cast < char * > (&c), sizeof(float)); SWAP4(c);
 				Vector3f Cx(a,b,c);
 
 	//			if(N.lengthSquared() != 1.0f)
@@ -225,6 +240,7 @@ bool STL::Read(string filename, bool force_binary)
 
 				unsigned short xxx;
 				infile.read(reinterpret_cast < char * > (&xxx), sizeof(unsigned short));
+				// Not used so no SWAP2(..)
 
 				Triangle T(N,Ax,Bx,Cx);
 
