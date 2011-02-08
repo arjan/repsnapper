@@ -53,9 +53,10 @@ ifeq ($(UNAME),Darwin)
     INC=-I$(MACPORTS_DIR)/include -I$(LIB_DIR)/vmmlib/include -I$(LIB_DIR)
     INC+=-I$(LIB_DIR)/polylib
     INC+=-pthread
-    LDFLAGS=-L$(MACPORTS_DIR)/lib -pthread -lfltk -lfltk_forms -lfltk_gl -lconfig++ -lboost_thread-mt -lboost_system-mt
+    LDFLAGS=-L$(MACPORTS_DIR)/lib -pthread /opt/local/lib/libfltk.a /opt/local/lib/libfltk_forms.a /opt/local/lib/libfltk_gl.a /opt/local/lib/libconfig++.a /opt/local/lib/libboost_thread-mt.a /opt/local/lib/libboost_system-mt.a -arch i386
     LDFLAGS+=-L$(LIB_DIR)/polylib -lpolylib
     LDFLAGS+=-framework Carbon -framework OpenGL -framework GLUT -framework AGL
+    CFLAGS+=-arch i386
     TEST_LDFLAGS=-lboost_unit_test_framework
 endif
 
@@ -127,12 +128,6 @@ osx-bundle: all
 	cp Info.plist repsnapper.app/Contents/
 	cp repsnapper repsnapper.app/Contents/
 	cp repsnapper-osx.sh repsnapper.app/Contents/
-	cp $(OSX_INC_LIB_DIR)/libboost* repsnapper.app/Contents/lib/
-	cp $(OSX_INC_LIB_DIR)/libconfig* repsnapper.app/Contents/lib/
-	cp $(OSX_INC_LIB_DIR)/libfltk* repsnapper.app/Contents/lib/
-	cp $(OSX_INC_LIB_DIR)/libpng* repsnapper.app/Contents/lib/
-	cp $(OSX_INC_LIB_DIR)/libjpeg* repsnapper.app/Contents/lib/
-	yes | rm -f repsnapper.app/Contents/lib/libboost*.a
 
 osx-dmg: osx-bundle
 	mkdir -p repsnapper-temp

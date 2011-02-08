@@ -17,10 +17,10 @@
 
 # polylib makefile
 INC=../vmmlib/include
-CXXFLAGS=-c -I$(INC) -Wall
+CXXFLAGS=-c -I$(INC) -Wall -arch i386
 
 all: libpolylib.a
-	
+
 libpolylib.a: GeometryBase.o Polygon2f.o
 	ar -r libpolylib.a GeometryBase.o Polygon2f.o
 
