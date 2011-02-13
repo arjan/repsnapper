@@ -48,16 +48,20 @@ endif
 
 # Mac
 ifeq ($(UNAME),Darwin)
+    ARCH := $(shell uname -p)
     # see notes in readme.macosx.txt
     MACPORTS_DIR=/opt/local
     INC=-I$(MACPORTS_DIR)/include -I$(LIB_DIR)/vmmlib/include -I$(LIB_DIR)
     INC+=-I$(LIB_DIR)/polylib
     INC+=-pthread
-    LDFLAGS=-L$(MACPORTS_DIR)/lib -pthread /opt/local/lib/libfltk.a /opt/local/lib/libfltk_forms.a /opt/local/lib/libfltk_gl.a /opt/local/lib/libconfig++.a /opt/local/lib/libboost_thread-mt.a /opt/local/lib/libboost_system-mt.a -arch i386
+    LDFLAGS=-L$(MACPORTS_DIR)/lib -pthread /opt/local/lib/libfltk.a /opt/local/lib/libfltk_forms.a /opt/local/lib/libfltk_gl.a /opt/local/lib/libconfig++.a /opt/local/lib/libboost_thread-mt.a /opt/local/lib/libboost_system-mt.a
     LDFLAGS+=-L$(LIB_DIR)/polylib -lpolylib
     LDFLAGS+=-framework Carbon -framework OpenGL -framework GLUT -framework AGL
-    CFLAGS+=-arch i386
     TEST_LDFLAGS=-lboost_unit_test_framework
+    ifeq ($(ARCH),i386)
+        CFLAGS+=-arch i386
+        LDFLAGS+=-arch i386
+    endif
 endif
 
 GENERATED=ui.cxx ui.h

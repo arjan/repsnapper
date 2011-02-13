@@ -17,7 +17,18 @@
 
 # polylib makefile
 INC=../vmmlib/include
-CXXFLAGS=-c -I$(INC) -Wall -arch i386
+CXXFLAGS=-c -I$(INC) -Wall
+
+UNAME := $(shell uname)
+
+# Mac
+ifeq ($(UNAME),Darwin)
+    ARCH := $(shell uname -p)
+    ifeq ($(ARCH),i386)
+        CXXFLAGS+=-arch i386
+    endif
+endif
+
 
 all: libpolylib.a
 
