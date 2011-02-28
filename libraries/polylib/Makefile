@@ -19,8 +19,19 @@
 INC=../vmmlib/include
 CXXFLAGS=-c -I$(INC) -Wall
 
+UNAME := $(shell uname)
+
+# Mac
+ifeq ($(UNAME),Darwin)
+    ARCH := $(shell uname -p)
+    ifeq ($(ARCH),i386)
+        CXXFLAGS+=-arch i386
+    endif
+endif
+
+
 all: libpolylib.a
-	
+
 libpolylib.a: GeometryBase.o Polygon2f.o
 	ar -r libpolylib.a GeometryBase.o Polygon2f.o
 
