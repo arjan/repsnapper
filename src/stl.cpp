@@ -61,7 +61,7 @@ extern "C" {
 #define MAX(A,B) ((A)>(B)? (A):(B))
 #define ABS(a)	   (((a) < 0) ? -(a) : (a))
 
-#ifdef __ppc__
+#ifdef __BIG_ENDIAN__
 #define SWAP4( _v ) {	     \
     char *vp = (char*)&(_v); \
     char vt = vp[0];	     \
